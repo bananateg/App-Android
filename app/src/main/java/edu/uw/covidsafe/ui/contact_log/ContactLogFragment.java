@@ -10,13 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.covidsafe.R;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.viewpager.widget.ViewPager;
 import edu.uw.covidsafe.ui.MainActivity;
 import edu.uw.covidsafe.utils.Constants;
 
@@ -66,11 +67,13 @@ public class ContactLogFragment extends Fragment {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == 0) {
+                    Constants.CurrentFragment = Constants.LocationFragment;
                     if (Constants.menu != null && Constants.menu.findItem(R.id.mybutton) != null) {
                         Constants.menu.findItem(R.id.mybutton).setVisible(true);
                     }
                 }
                 else {
+                    Constants.CurrentFragment = Constants.PeopleFragment;
                     if (Constants.menu != null && Constants.menu.findItem(R.id.mybutton) != null) {
                         Constants.menu.findItem(R.id.mybutton).setVisible(false);
                     }
@@ -81,11 +84,13 @@ public class ContactLogFragment extends Fragment {
             public void onPageSelected(int position) {
 //                Log.e("time","onpageselected "+position);
                 if (position == 0) {
+                    Constants.CurrentFragment = Constants.LocationFragment;
                     if (Constants.menu != null && Constants.menu.findItem(R.id.mybutton) != null) {
                         Constants.menu.findItem(R.id.mybutton).setVisible(true);
                     }
                 }
                 else {
+                    Constants.CurrentFragment = Constants.PeopleFragment;
                     if (Constants.menu != null && Constants.menu.findItem(R.id.mybutton) != null) {
                         Constants.menu.findItem(R.id.mybutton).setVisible(false);
                     }

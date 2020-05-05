@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattServer;
 import android.location.LocationManager;
+import android.os.Build;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Switch;
@@ -15,23 +16,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.covidsafe.R;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
-
-
-import edu.uw.covidsafe.preferences.AppPreferencesHelper;
-import edu.uw.covidsafe.contact_trace.GpsHistoryRecyclerViewAdapter2;
-import edu.uw.covidsafe.contact_trace.HumanRecord;
-import edu.uw.covidsafe.gps.GpsRecord;
-import edu.uw.covidsafe.symptoms.SymptomsRecord;
-import edu.uw.covidsafe.ui.MainFragment;
-import edu.uw.covidsafe.ui.contact_log.LocationFragment;
-import edu.uw.covidsafe.ui.contact_log.PeopleFragment;
-import edu.uw.covidsafe.ui.faq.FaqFragment;
-import edu.uw.covidsafe.ui.health.TipRecyclerViewAdapter;
-import edu.uw.covidsafe.ui.notif.HistoryRecyclerViewAdapter;
-import edu.uw.covidsafe.ui.notif.NotifRecyclerViewAdapter;
-import edu.uw.covidsafe.symptoms.SymptomTrackerFragment;
-import edu.uw.covidsafe.ui.health.DiagnosisFragment;
-import edu.uw.covidsafe.gps.ImportLocationHistoryFragment;
 
 import java.security.KeyStore;
 import java.util.Arrays;
@@ -46,13 +30,27 @@ import java.util.concurrent.ScheduledFuture;
 
 import javax.crypto.SecretKey;
 
-import edu.uw.covidsafe.ui.health.HealthFragment;
-import edu.uw.covidsafe.ui.settings.SettingsFragment;
-import edu.uw.covidsafe.ui.contact_log.ContactLogFragment;
 import edu.uw.covidsafe.contact_trace.ContactTraceFragment;
-
-import edu.uw.covidsafe.ui.onboarding.PermissionFragment;
+import edu.uw.covidsafe.contact_trace.GpsHistoryRecyclerViewAdapter2;
+import edu.uw.covidsafe.contact_trace.HumanRecord;
+import edu.uw.covidsafe.gps.GpsRecord;
+import edu.uw.covidsafe.gps.ImportLocationHistoryFragment;
+import edu.uw.covidsafe.preferences.AppPreferencesHelper;
+import edu.uw.covidsafe.symptoms.SymptomTrackerFragment;
+import edu.uw.covidsafe.symptoms.SymptomsRecord;
+import edu.uw.covidsafe.ui.MainFragment;
+import edu.uw.covidsafe.ui.contact_log.ContactLogFragment;
+import edu.uw.covidsafe.ui.contact_log.LocationFragment;
+import edu.uw.covidsafe.ui.contact_log.PeopleFragment;
+import edu.uw.covidsafe.ui.faq.FaqFragment;
+import edu.uw.covidsafe.ui.health.DiagnosisFragment;
+import edu.uw.covidsafe.ui.health.HealthFragment;
+import edu.uw.covidsafe.ui.health.TipRecyclerViewAdapter;
+import edu.uw.covidsafe.ui.notif.HistoryRecyclerViewAdapter;
+import edu.uw.covidsafe.ui.notif.NotifRecyclerViewAdapter;
 import edu.uw.covidsafe.ui.onboarding.PagerFragment;
+import edu.uw.covidsafe.ui.onboarding.PermissionFragment;
+import edu.uw.covidsafe.ui.settings.SettingsFragment;
 
 public class Constants {
 
@@ -63,7 +61,7 @@ public class Constants {
 
     public static boolean UI_AUTH = false;
     public static boolean WRITE_TO_DISK = false;
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
     public static boolean PUBLIC_DEMO = true;
     public static boolean NARROWCAST_ENABLE = true;
     public static boolean USE_LAST_QUERY_TIME = true;
@@ -219,6 +217,8 @@ public class Constants {
     public static ViewPager contactLogViewPager;
     public static Calendar contactLogMonthCalendar = Calendar.getInstance();
     public static Calendar symptomTrackerMonthCalendar = Calendar.getInstance();
+    public static String KML_FILE_NAME = "CovidSafe_Google_Location_History.kml";
+    public static int deviceID;
 
     public static GpsHistoryRecyclerViewAdapter2 contactGpsAdapter;
     public static List<HumanRecord> changedContactHumanRecords;
@@ -240,8 +240,8 @@ public class Constants {
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
     public static String[] blePermissions= {
-        Manifest.permission.BLUETOOTH_ADMIN,
-        Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.BLUETOOTH,
     };
     public static String[] miscPermissions= {
             Manifest.permission.FOREGROUND_SERVICE,
@@ -250,6 +250,38 @@ public class Constants {
 
     public static List<String> languages = new LinkedList<>(Arrays.asList("en","es"));
     public static String defaultLocale = "en";
+    public static HashMap<Integer,Integer> bleThresholds = new HashMap<>();
+    public static List<String> deviceNames = new LinkedList<>();
+    public static List<String> manufacturerNames = new LinkedList<>();
+
+    public static void getDeviceID() {
+        String manufacturer = Build.MANUFACTURER.toLowerCase();
+
+        String model = Build.MODEL.toLowerCase();
+        model = model.replace("-","");
+        model = model.replace(manufacturer,"");
+
+        if (!Constants.manufacturerNames.contains(manufacturer)) {
+            Constants.deviceID = 0;
+        }
+        else {
+            int counter = 1;
+            for (String deviceName : Constants.deviceNames) {
+                // we are a samsung model
+                if (model.startsWith("sm")) {
+                    // trim off the last character, which is the carrier designator
+                    deviceName = deviceName.substring(0, deviceName.length()-1);
+                    model = model.substring(0, model.length()-1);
+
+                }
+                if (model.equals(deviceName)) {
+                    deviceID = counter;
+                    break;
+                }
+                counter++;
+            }
+        }
+    }
 
     public static void init(Activity av) {
         Log.e("logme","constants init");
@@ -275,8 +307,16 @@ public class Constants {
             symptoms.add(av.getString(R.string.difficult_in_breathing_not_severe));
             symptoms.add(av.getString(R.string.headache_txt));
             symptoms.add(av.getString(R.string.sore_throat_txt));
-            symptoms.add(av.getString(R.string.vomitting_txt));
+            symptoms.add(av.getString(R.string.vomiting_txt));
         }
+
+        if (bleThresholds.keySet().size() == 0) {
+            bleThresholds = FileOperations.readDeviceThresholds(av, R.raw.device_data);
+            deviceNames = FileOperations.readDeviceList(av, R.raw.device_data);
+            manufacturerNames = FileOperations.readManufacturerList(av, R.raw.device_data);
+        }
+
+        getDeviceID();
 
         MainFragment = new MainFragment();
         MainFragmentState = MainFragment;

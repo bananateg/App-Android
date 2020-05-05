@@ -22,6 +22,7 @@
     <string name="default_exposed_notif">Based on your location history, we believe you might have been in the same place as people infected with COVID-19.</string>
     <string name="exposed_notif2">Please contact your healthcare professional.</string>
 
+    <string name="select_contact">Select Contacts</string>
     <string name="warning">Warning</string>
     <string name="logging_now_off">Logging is now turned off.</string>
     <string name="inter_prep">Interview Preparation</string>
@@ -470,7 +471,7 @@ You can prepare a list of informaton they will ask about based on information co
     <string name="headache_txt">Headache</string>
     <string name="chest_pain_txt">Chest pains</string>
     <string name="sore_throat_txt">Sore throat</string>
-    <string name="vomitting_txt">Vomitting</string>
+    <string name="vomiting_txt">Vomtting</string>
     <string name="announcement_txt">Announcement</string>
     <string name="bluetooth_is_disabled_on_this_device">Bluetooth is disabled on this device</string>
     <string name="not_logged_txt">Not logged</string>

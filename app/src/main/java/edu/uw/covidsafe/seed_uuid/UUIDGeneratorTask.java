@@ -6,15 +6,11 @@ import android.util.Log;
 
 import com.example.covidsafe.R;
 
-import edu.uw.covidsafe.ble.BluetoothScanHelper;
+import java.util.UUID;
+
 import edu.uw.covidsafe.ble.BluetoothUtils;
-import edu.uw.covidsafe.utils.ByteUtils;
 import edu.uw.covidsafe.utils.Constants;
 import edu.uw.covidsafe.utils.CryptoUtils;
-import edu.uw.covidsafe.utils.TimeUtils;
-import edu.uw.covidsafe.utils.Utils;
-
-import java.util.UUID;
 
 public class UUIDGeneratorTask implements Runnable {
 
@@ -34,6 +30,7 @@ public class UUIDGeneratorTask implements Runnable {
 
             Log.e("crypto","most recent seed timestamp "+mostRecentSeedTimestamp);
             UUID uuid = CryptoUtils.generateSeedHelperWithMostRecent(context, mostRecentSeedTimestamp);
+
             Log.e("ble", "changing contact uuid now");
             if (uuid != null) {
                 Log.e("ble", "changing contact uuid now to " + uuid.toString());

@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.Html;
 import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -202,7 +203,7 @@ public class TipRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
         else {
             ((ActionCard)holder).title.setText(titles.get(position));
-            if (desc.get(position).getClass().toString().toLowerCase().contains("spannable")) {
+            if (desc.get(position).getClass().toString().contains(SpannableStringBuilder.class.toString())) {
 //                Log.e("spannable",desc.get(position).toString());
                 ((ActionCard) holder).desc.setText((Spannable) desc.get(position));
             }

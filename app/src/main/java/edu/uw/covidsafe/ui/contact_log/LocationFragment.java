@@ -131,15 +131,20 @@ public class LocationFragment extends Fragment {
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 Log.e("contact","on date selected "+date.toString());
                 Log.e("contact","on date selected "+date.getYear()+","+date.getMonth()+","+date.getDay());
-                Constants.contactLogMonthCalendar.set(date.getYear(),date.getMonth()-1,date.getDay());
-                updateLocationView(date, getContext());
+                if (selected) {
+                    Constants.contactLogMonthCalendar.set(date.getYear(), date.getMonth() - 1, date.getDay());
+                    updateLocationView(date, getContext());
+                }
             }
         });
     }
 
     public static void updateLocationView(CalendarDay dd, Context cxt) {
-        Constants.contactLogCal.setCurrentDate(dd);
-        Constants.contactLogCal.setSelectedDate(dd);
+        if (!Constants.contactLogCal.getMinimumDate().isAfter(dd) &&
+            !Constants.contactLogCal.getMaximumDate().isBefore(dd)) {
+            Constants.contactLogCal.setCurrentDate(dd);
+            Constants.contactLogCal.setSelectedDate(dd);
+        }
 
         markDays(cxt);
         try {
@@ -195,7 +200,6 @@ public class LocationFragment extends Fragment {
     }
 
     private static class EventDecorator implements DayViewDecorator {
-
         private final int color;
         private final HashSet<CalendarDay> dates;
 
